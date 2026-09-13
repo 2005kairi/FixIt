@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.FixIt" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/fixit_primary</item>
+        <item name="colorPrimaryDark">@color/fixit_primary_dark</item>
+        <item name="colorAccent">@color/fixit_accent</item>
+    </style>
+</resources>

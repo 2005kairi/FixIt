@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">FixIt</string>
+
+    <!-- Person 1: Login / Signup -->
+    <string name="login_title">Log In</string>
+    <string name="signup_title">Sign Up</string>
+
+    <!-- Person 3: Tenant -->
+    <string name="tenant_home_title">My Requests</string>
+    <string name="new_request_title">New Maintenance Request</string>
+
+    <!-- Person 4: Landlord -->
+    <string name="landlord_home_title">Property Requests</string>
+    <string name="request_detail_title">Request Details</string>
+</resources>
