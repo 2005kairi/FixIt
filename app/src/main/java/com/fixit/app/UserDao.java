@@ -4,14 +4,18 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-// Owner: Person 2 (User Data Layer)
 @Dao
 public interface UserDao {
 
     @Insert
     long insert(User user);
 
-    // TODO: Person 2 - used by LoginActivity for authentication + role-based routing
-    @Query("SELECT * FROM users WHERE email = :email AND password = :password LIMIT 1")
-    User authenticate(String email, String password);
+    @Query("SELECT * FROM users WHERE username = :username AND password = :password LIMIT 1")
+    User login(String username, String password);
+
+    @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
+    User getByUsername(String username);
+
+    @Query("SELECT * FROM users WHERE user_id = :userId LIMIT 1")
+    User getById(int userId);
 }
