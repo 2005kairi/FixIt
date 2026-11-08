@@ -34,9 +34,37 @@ public class LoginActivity extends AppCompatActivity {
         Button btnLogin = findViewById(R.id.btnLogin);
         TextView tvGoSignup = findViewById(R.id.tvGoSignup);
 
+        seedDemoUsers();
+
         btnLogin.setOnClickListener(v -> attemptLogin());
         tvGoSignup.setOnClickListener(v ->
                 startActivity(new Intent(this, SignupActivity.class)));
+    }
+
+    // TEMPORARY: demo accounts so Login can be tested before Sign Up exists. Remove before final submission.
+    private void seedDemoUsers() {
+        executor.execute(() -> {
+            UserDao dao = AppDatabase.getInstance(getApplicationContext()).userDao();
+            if (dao.getByUsername("tenant1") == null) {
+                User tenant = new User();
+                tenant.name = "Demo Tenant";
+                tenant.username = "tenant1";
+                tenant.password = "tenant123";
+                tenant.email = "tenant1@example.com";
+                tenant.role = User.ROLE_TENANT;
+                tenant.unitNumber = "A-101";
+                dao.insert(tenant);
+            }
+            if (dao.getByUsername("landlord1") == null) {
+                User landlord = new User();
+                landlord.name = "Demo Landlord";
+                landlord.username = "landlord1";
+                landlord.password = "landlord123";
+                landlord.email = "landlord1@example.com";
+                landlord.role = User.ROLE_LANDLORD;
+                dao.insert(landlord);
+            }
+        });
     }
 
     private void attemptLogin() {
