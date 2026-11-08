@@ -8,27 +8,34 @@ requests and landlords to track and resolve them.
 1. Clone the repo and open the root folder in Android Studio.
 2. Let Android Studio sync Gradle. This project ships without a Gradle
    wrapper jar (binary file, not checked in) — Android Studio will offer to
-   download/regenerate it on first sync. If it doesn't prompt automatically,
-   run `gradle wrapper` once you have Gradle installed locally.
-3. Check out your branch (see below) and work only inside your files —
-   everyone shares `main` as the integration branch.
+   download/regenerate it on first sync.
+3. Work only inside your own files (table below) so nobody edits the same file.
 
-## Team split & branches
+## Workflow (single `main` branch)
 
-| Branch | Owner | Files |
+Everyone works directly on `main`. To avoid conflicts:
+
+- Only edit the files you own.
+- `git pull --rebase` before you start and before you push.
+- Commit small and push often.
+
+## File split
+
+| Person | Screen | Files |
 |---|---|---|
-| `person1-login-signup` | Person 1 | `LoginActivity.java`, `SignupActivity.java`, `activity_login.xml`, `activity_signup.xml` |
-| `person2-user-data` | Person 2 | `User.java`, `UserDao.java` (role-based routing used by `LoginActivity`) |
-| `person3-tenant` | Person 3 | `TenantHomeActivity.java`, `NewRequestActivity.java`, `activity_tenant_home.xml`, `activity_new_request.xml`, `item_request.xml`, `RequestAdapter.java` |
-| `person4-landlord` | Person 4 | `LandlordHomeActivity.java`, `RequestDetailActivity.java`, `activity_landlord_home.xml`, `activity_request_detail.xml` |
-| `person5-request-broadcast` | Person 5 | `Request.java`, `RequestDao.java`, `NewRequestReceiver.java`, notification setup, `<receiver>` entry in `AndroidManifest.xml` |
-| `person6-database-integration` | Person 6 | `AppDatabase.java`, `strings.xml`, `colors.xml`, `themes.xml`, final `AndroidManifest.xml` merge, `build.gradle` dependencies, end-to-end testing |
+| 1 | Login | `LoginActivity.java`, `activity_login.xml`, `User.java`, `UserDao.java` |
+| 2 | Sign Up | `SignupActivity.java`, `activity_signup.xml`, `AppDatabase.java`, `build.gradle` (Room + RecyclerView) |
+| 3 | Tenant Home | `TenantHomeActivity.java`, `activity_tenant_home.xml`, `RequestAdapter.java`, `item_request.xml` |
+| 4 | New Request | `NewRequestActivity.java`, `activity_new_request.xml`, `Request.java`, `RequestDao.java` |
+| 5 | Landlord Home | `LandlordHomeActivity.java`, `activity_landlord_home.xml`, `NewRequestReceiver.java` (with the notification) |
+| 6 | Request Detail | `RequestDetailActivity.java`, `activity_request_detail.xml`, `AndroidManifest.xml`, end-to-end testing |
 
-Each branch starts from `main` and already contains the full skeleton
-(all activities/receiver wired into the manifest, Room + RecyclerView deps
-in `app/build.gradle`) so the project compiles from day one. Every stub file
-has a `// TODO: PersonN - ...` comment marking what's left to build.
+Every file already exists as a stub with a `// TODO: PersonN - ...` marker.
 
-Workflow: work on your branch, open a PR into `main` when your slice is
-ready, Person 6 integrates and runs the end-to-end test:
-signup → login → submit request → landlord sees it → mark done.
+## Shared contract
+
+- Logged-in user: `LoginActivity.PREFS_NAME` (`"fixit_prefs"`), `KEY_USER_ID`, `KEY_ROLE`.
+- Roles: `User.ROLE_TENANT`, `User.ROLE_LANDLORD`.
+- Pending = orange, Done = green, on every screen.
+
+End-to-end test: signup → login → submit request → landlord sees it → mark done.
