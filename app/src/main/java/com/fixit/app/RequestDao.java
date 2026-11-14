@@ -7,7 +7,6 @@ import androidx.room.Update;
 
 import java.util.List;
 
-// Owner: Person 5 (Request Data Layer + Broadcast)
 @Dao
 public interface RequestDao {
 
@@ -15,11 +14,15 @@ public interface RequestDao {
     long insert(Request request);
 
     @Update
-    void update(Request request);
+    int update(Request request);
 
-    @Query("SELECT * FROM requests WHERE tenantId = :tenantId")
-    List<Request> getForTenant(int tenantId);
-
-    @Query("SELECT * FROM requests")
+    // Newest first (Landlord Home then moves Pending to the top)
+    @Query("SELECT * FROM requests ORDER BY created_at DESC")
     List<Request> getAll();
+
+    @Query("SELECT * FROM requests WHERE tenant_id = :tenantId ORDER BY created_at DESC")
+    List<Request> getByTenant(int tenantId);
+
+    @Query("SELECT * FROM requests WHERE request_id = :id LIMIT 1")
+    Request getById(int id);
 }
