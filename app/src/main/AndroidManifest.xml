@@ -39,4 +39,12 @@
 
     </application>
 
+    <!-- Lets RequestDetailActivity find an email app on Android 11+ -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+    </queries>
+
 </manifest>
