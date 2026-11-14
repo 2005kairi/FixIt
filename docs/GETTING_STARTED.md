@@ -1,53 +1,59 @@
-# FixIt — Getting Started
+# FixIt: Getting Started
 
 How to get the project on your computer, open it and start working.
+(The same guide is available as `GETTING_STARTED.pdf` / `.docx`.)
 
 ## 1. Before you start
 
 1. Install **Android Studio**: https://developer.android.com/studio
-2. Make sure you have a GitHub account and **accept the invitation** to the repo
-   (check your email, or open https://github.com/2005kairi/FixIt/invitations).
+2. **Accept the GitHub invitation** (check your email, or open https://github.com/2005kairi/FixIt/invitations).
    Without accepting you can read the repo but not push.
 3. Install **Git** if you don't have it: https://git-scm.com/downloads
 
 ## 2. Clone the project
 
-Option A, in Android Studio (easiest):
+In Android Studio: **Get from VCS** (or File > New > Project from Version Control), URL
+`https://github.com/2005kairi/FixIt.git`, pick a folder and click **Clone**.
 
-1. Open Android Studio, choose **Get from VCS** (or File > New > Project from Version Control).
-2. URL: `https://github.com/2005kairi/FixIt.git`
-3. Pick a folder and click **Clone**. Sign in to GitHub if it asks.
-
-Option B, in a terminal:
+Or in a terminal:
 
 ```bash
 git clone https://github.com/2005kairi/FixIt.git
 ```
 
-Then in Android Studio choose **Open** and select the `FixIt` folder.
+Then open the `FixIt` folder in Android Studio.
 
 ## 3. Open and build
 
 1. Wait for **Gradle sync** to finish (first time can take a few minutes).
-2. If a message says the Gradle wrapper is missing, click the option to
-   download/regenerate it. This is expected.
-3. Create a phone to test on: **Tools > Device Manager > Create Device**, pick any
-   Pixel phone and a recent Android version.
+2. If a message says the Gradle wrapper is missing, click the option to download or regenerate it.
+3. Create a phone: **Tools > Device Manager > Create Device** (any Pixel, recent Android).
 4. Click the green **Run** button.
 
-## 4. Test login
+If the app complains about Java or Gradle versions, open File > Settings > Build Tools > Gradle
+and set the Gradle JDK to the bundled JDK.
 
-The app creates two demo accounts the first time it opens:
+## 4. Log in and try it
 
-| Role | Username | Password |
-|---|---|---|
-| Tenant | `tenant1` | `tenant123` |
-| Landlord | `landlord1` | `landlord123` |
+The app creates these accounts and eight sample requests the first time it starts with an empty database.
+
+| Role | Username | Password | Unit | Landlord |
+|---|---|---|---|---|
+| Landlord | `landlord1` | `landlord123` | | |
+| Landlord | `landlord2` | `landlord123` | | |
+| Tenant | `tenant1` | `tenant123` | A-101 | landlord1 |
+| Tenant | `tenant2` | `tenant123` | A-102 | landlord1 |
+| Tenant | `tenant3` | `tenant123` | B-201 | landlord2 |
+
+If you already ran an older version, clear the app's storage (long-press the app icon > App info >
+Storage > Clear storage) or uninstall it, so the new demo data is created.
+
+Quick tour: log in as `tenant1` and submit a request; log in as `landlord1`, open it and mark it Done
+or Reject it with reasons; log back in as `tenant1` to see the result.
 
 ## 5. Start working
 
-Everyone works on the single `main` branch, and every file already exists as a
-stub marked `// TODO: PersonN - ...`. **Only edit the files you own:**
+Everyone works on the single `main` branch. **Only edit the files you own:**
 
 | Person | Screen | Files |
 |---|---|---|
@@ -62,8 +68,6 @@ Java files are in `app/src/main/java/com/fixit/app/`, layouts in `app/src/main/r
 
 ## 6. Save and share your work
 
-Run these in the terminal at the bottom of Android Studio (or use the Git menu):
-
 ```bash
 git pull --rebase          # get everyone's latest changes first
 git add <your files>       # only the files you changed
@@ -72,17 +76,13 @@ git pull --rebase          # again, in case someone pushed meanwhile
 git push
 ```
 
-Tips:
-
 - Pull before you start each day and before every push.
 - Commit small and push often.
-- If `git pull --rebase` reports a conflict, you most likely edited someone else's
-  file. Ask the owner before fixing it.
+- If `git pull --rebase` reports a conflict, you most likely edited someone else's file. Ask the owner first.
 - Do not commit the `build/` folder or `local.properties` (they are already ignored).
 
-## Shared rules
+## 7. More documentation
 
-- Logged-in user: `LoginActivity.PREFS_NAME` (`"fixit_prefs"`), `KEY_USER_ID`, `KEY_ROLE`.
-- Roles: `User.ROLE_TENANT`, `User.ROLE_LANDLORD`.
-- Pending = orange, Done = green, on every screen.
-- Test every screen in portrait so report screenshots match.
+- `PROJECT_DOCUMENTATION`: screens, features, data model, architecture, rules and the test plan.
+- `PERSON1_LOGIN_WORK`: the Login screen with its full source.
+- `CHECKLISTS_ALL_STUDENTS`: one checklist page per team member.
