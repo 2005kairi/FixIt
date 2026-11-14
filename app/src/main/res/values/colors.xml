@@ -2,6 +2,8 @@
     <color name="fixit_primary">#2E7D32</color>
     <color name="fixit_primary_dark">#1B5E20</color>
     <color name="fixit_accent">#FFA000</color>
+    <color name="status_pending">#E68200</color>
+    <color name="status_done">#1E8C41</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
 </resources>
