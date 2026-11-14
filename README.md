@@ -25,7 +25,7 @@ requests and their landlord tracks, completes or rejects them.
 - Get a notification when a new request is submitted.
 
 **Everyone**
-- Password rule at sign up: at least 4 letters and 3 numbers.
+- Password rule at sign up: must start with a letter and have at least 4 letters and 3 numbers.
 - Welcome message with the user's name, green title bars, and Back buttons on inner screens.
 
 ## Demo accounts
