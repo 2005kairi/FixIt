@@ -93,8 +93,9 @@ public class SignupActivity extends AppCompatActivity {
                 digits++;
             }
         }
-        if (letters < 4 || digits < 3) {
-            Toast.makeText(this, "Password must have at least 4 letters and 3 numbers",
+        if (!Character.isLetter(password.charAt(0)) || letters < 4 || digits < 3) {
+            Toast.makeText(this,
+                    "Password must start with a letter and have at least 4 letters and 3 numbers",
                     Toast.LENGTH_LONG).show();
             return;
         }
