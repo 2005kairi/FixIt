@@ -13,8 +13,14 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE username = :username AND password = :password LIMIT 1")
     User login(String username, String password);
 
+    @Query("SELECT COUNT(*) FROM users")
+    int countUsers();
+
     @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
     User getByUsername(String username);
+
+    @Query("SELECT * FROM users WHERE username = :username AND role = 'landlord' LIMIT 1")
+    User getLandlordByUsername(String username);
 
     @Query("SELECT * FROM users WHERE user_id = :userId LIMIT 1")
     User getById(int userId);

@@ -27,4 +27,8 @@ public class User {
 
     @ColumnInfo(name = "unit_number")
     public String unitNumber;
+
+    // Set for tenants only: the user_id of their landlord.
+    @ColumnInfo(name = "landlord_id")
+    public Integer landlordId;
 }

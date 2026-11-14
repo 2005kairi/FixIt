@@ -6,4 +6,11 @@
     <color name="status_done">#1E8C41</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
+
+    <color name="fixit_background">#F4F6F4</color>
+    <color name="fixit_text">#1C211D</color>
+    <color name="fixit_text_secondary">#6B746C</color>
+    <color name="fixit_stroke">#DDE3DD</color>
+    <color name="fixit_danger">#C62828</color>
+    <color name="fixit_logo_dark">#1B4D20</color>
 </resources>

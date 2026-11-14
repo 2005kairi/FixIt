@@ -59,6 +59,20 @@ public class LandlordHomeActivity extends AppCompatActivity {
         rvAllRequests.setAdapter(adapter);
         btnLogout.setOnClickListener(v -> logout());
         requestNotificationPermission();
+
+        TextView tvWelcome = findViewById(R.id.tvWelcome);
+        int userId = getSharedPreferences(LoginActivity.PREFS_NAME, MODE_PRIVATE)
+                .getInt(LoginActivity.KEY_USER_ID, -1);
+        executor.execute(() -> {
+            User user = AppDatabase.getInstance(getApplicationContext())
+                    .userDao().getById(userId);
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                if (user != null && user.name != null && !user.name.trim().isEmpty()) {
+                    tvWelcome.setText("Welcome back, " + user.name.trim());
+                }
+            });
+        });
     }
 
     private void requestNotificationPermission() {
@@ -100,7 +114,9 @@ public class LandlordHomeActivity extends AppCompatActivity {
         executor.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(
                     getApplicationContext());
-            List<Request> all = db.requestDao().getAll();
+            int landlordId = getSharedPreferences(LoginActivity.PREFS_NAME, MODE_PRIVATE)
+                    .getInt(LoginActivity.KEY_USER_ID, -1);
+            List<Request> all = db.requestDao().getForLandlord(landlordId);
             all.sort((a, b) -> Boolean.compare(
                     "pending".equalsIgnoreCase(b.status),
                     "pending".equalsIgnoreCase(a.status)));
@@ -181,11 +197,14 @@ public class LandlordHomeActivity extends AppCompatActivity {
                     .format(new Date(r.createdAt)));
             h.unit.setVisibility(View.VISIBLE);
             h.unit.setText("Unit: " + data.unit);
-            boolean pending = "pending".equalsIgnoreCase(r.status);
-            h.status.setText(pending ? "Pending" : "Done");
+            boolean done = Request.STATUS_DONE.equalsIgnoreCase(r.status);
+            boolean rejected = Request.STATUS_REJECTED.equalsIgnoreCase(r.status);
+            h.status.setText(done ? Request.STATUS_DONE
+                    : rejected ? Request.STATUS_REJECTED : Request.STATUS_PENDING);
             h.status.setTextColor(ContextCompat.getColor(
                     LandlordHomeActivity.this,
-                    pending ? R.color.status_pending : R.color.status_done));
+                    done ? R.color.status_done
+                            : rejected ? R.color.fixit_danger : R.color.status_pending));
             h.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(
                         LandlordHomeActivity.this,

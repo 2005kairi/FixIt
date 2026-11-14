@@ -23,6 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText etEmail;
     private EditText etSignupPassword;
     private EditText etUnit;
+    private EditText etLandlordUsername;
     private RadioGroup rgRole;
     private Button btnSignup;
 
@@ -31,21 +32,22 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         etName = findViewById(R.id.etName);
         etSignupUsername = findViewById(R.id.etSignupUsername);
         etEmail = findViewById(R.id.etEmail);
         etSignupPassword = findViewById(R.id.etSignupPassword);
         etUnit = findViewById(R.id.etUnit);
+        etLandlordUsername = findViewById(R.id.etLandlordUsername);
         rgRole = findViewById(R.id.rgRole);
         btnSignup = findViewById(R.id.btnSignup);
 
         // Tenant is selected by default in activity_signup.xml.
         rgRole.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.rbLandlord) {
-                etUnit.setVisibility(View.GONE);
-            } else {
-                etUnit.setVisibility(View.VISIBLE);
-            }
+            int visibility = checkedId == R.id.rbLandlord ? View.GONE : View.VISIBLE;
+            etUnit.setVisibility(visibility);
+            etLandlordUsername.setVisibility(visibility);
         });
 
         btnSignup.setOnClickListener(v -> attemptSignup());
@@ -57,6 +59,7 @@ public class SignupActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etSignupPassword.getText().toString();
         String unitNumber = etUnit.getText().toString().trim();
+        String landlordUsername = etLandlordUsername.getText().toString().trim();
 
         int selectedRoleId = rgRole.getCheckedRadioButtonId();
         if (selectedRoleId == -1) {
@@ -68,7 +71,8 @@ public class SignupActivity extends AppCompatActivity {
         boolean isTenant = selectedRoleId == R.id.rbTenant;
 
         if (name.isEmpty() || username.isEmpty() || email.isEmpty()
-                || password.isEmpty() || (isTenant && unitNumber.isEmpty())) {
+                || password.isEmpty()
+                || (isTenant && (unitNumber.isEmpty() || landlordUsername.isEmpty()))) {
             Toast.makeText(this, "Please fill in all fields",
                     Toast.LENGTH_SHORT).show();
             return;
@@ -77,6 +81,21 @@ public class SignupActivity extends AppCompatActivity {
         if (!email.contains("@")) {
             Toast.makeText(this, "Enter a valid email",
                     Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int letters = 0;
+        int digits = 0;
+        for (char c : password.toCharArray()) {
+            if (Character.isLetter(c)) {
+                letters++;
+            } else if (Character.isDigit(c)) {
+                digits++;
+            }
+        }
+        if (letters < 4 || digits < 3) {
+            Toast.makeText(this, "Password must have at least 4 letters and 3 numbers",
+                    Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -99,7 +118,22 @@ public class SignupActivity extends AppCompatActivity {
                     return;
                 }
 
+                Integer landlordId = null;
+                if (isTenant) {
+                    User landlord = dao.getLandlordByUsername(landlordUsername);
+                    if (landlord == null) {
+                        runOnUiThread(() -> {
+                            btnSignup.setEnabled(true);
+                            Toast.makeText(this, "Landlord not found",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                        return;
+                    }
+                    landlordId = landlord.userId;
+                }
+
                 User user = new User();
+                user.landlordId = landlordId;
                 user.name = name;
                 user.username = username;
                 user.email = email;

@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +39,23 @@ public class TenantHomeActivity extends AppCompatActivity {
         rvRequests.setLayoutManager(new LinearLayoutManager(this));
         requestAdapter = new RequestAdapter(this, new ArrayList<>());
         rvRequests.setAdapter(requestAdapter);
+        requestAdapter.setOnRequestClickListener(request -> {
+            if (Request.STATUS_PENDING.equals(request.status)) {
+                Intent intent = new Intent(TenantHomeActivity.this, NewRequestActivity.class);
+                intent.putExtra("request_id", request.id);
+                startActivity(intent);
+            } else if (Request.STATUS_REJECTED.equals(request.status)) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Request rejected")
+                        .setMessage("Reasons:\n"
+                                + RequestDetailActivity.formatReasons(request.rejectReasons))
+                        .setPositiveButton("OK", null)
+                        .show();
+            } else {
+                Toast.makeText(this, "Completed requests can't be edited",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         SharedPreferences preferences =
                 getSharedPreferences(LoginActivity.PREFS_NAME, MODE_PRIVATE);
@@ -51,6 +69,16 @@ public class TenantHomeActivity extends AppCompatActivity {
         }
 
         database = AppDatabase.getInstance(getApplicationContext());
+
+        TextView tvWelcome = findViewById(R.id.tvWelcome);
+        new Thread(() -> {
+            User user = database.userDao().getById(tenantId);
+            runOnUiThread(() -> {
+                if (user != null && user.name != null && !user.name.trim().isEmpty()) {
+                    tvWelcome.setText("Welcome back, " + user.name.trim());
+                }
+            });
+        }).start();
 
         btnNewRequest.setOnClickListener(v -> {
             Intent intent = new Intent(TenantHomeActivity.this,

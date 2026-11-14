@@ -17,8 +17,17 @@ import java.util.Locale;
 public class RequestAdapter
         extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
+    public interface OnRequestClickListener {
+        void onRequestClick(Request request);
+    }
+
     private final Context context;
     private final List<Request> requests;
+    private OnRequestClickListener clickListener;
+
+    public void setOnRequestClickListener(OnRequestClickListener listener) {
+        this.clickListener = listener;
+    }
 
     public RequestAdapter(Context context, List<Request> requests) {
         this.context = context;
@@ -49,6 +58,9 @@ public class RequestAdapter
         if (Request.STATUS_DONE.equals(request.status)) {
             holder.tvStatus.setTextColor(
                     ContextCompat.getColor(context, R.color.status_done));
+        } else if (Request.STATUS_REJECTED.equals(request.status)) {
+            holder.tvStatus.setTextColor(
+                    ContextCompat.getColor(context, R.color.fixit_danger));
         } else {
             holder.tvStatus.setTextColor(
                     ContextCompat.getColor(context, R.color.status_pending));
@@ -56,6 +68,10 @@ public class RequestAdapter
 
         // Tenant Home does not display the unit number.
         holder.tvUnit.setVisibility(View.GONE);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) clickListener.onRequestClick(request);
+        });
     }
 
     @Override

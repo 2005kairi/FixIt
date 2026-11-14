@@ -7,8 +7,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.concurrent.ExecutorService;
@@ -16,9 +18,14 @@ import java.util.concurrent.Executors;
 
 public class NewRequestActivity extends AppCompatActivity {
 
+    private TextView tvFormTitle;
     private EditText etTitle;
     private EditText etDescription;
     private Button btnSubmit;
+    private Button btnDelete;
+
+    // -1 means "create a new request"; otherwise the id of the request being edited.
+    private int editRequestId = -1;
 
     private final ExecutorService databaseExecutor =
             Executors.newSingleThreadExecutor();
@@ -31,11 +38,57 @@ public class NewRequestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_request);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        tvFormTitle = findViewById(R.id.tvFormTitle);
         etTitle = findViewById(R.id.etTitle);
         etDescription = findViewById(R.id.etDescription);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnDelete = findViewById(R.id.btnDelete);
 
         btnSubmit.setOnClickListener(view -> submitRequest());
+        btnDelete.setOnClickListener(view -> confirmDelete());
+
+        editRequestId = getIntent().getIntExtra("request_id", -1);
+        if (editRequestId != -1) {
+            loadRequestForEdit();
+        }
+    }
+
+    private int currentTenantId() {
+        SharedPreferences preferences = getSharedPreferences(
+                LoginActivity.PREFS_NAME, MODE_PRIVATE);
+        return preferences.getInt(LoginActivity.KEY_USER_ID, -1);
+    }
+
+    private void loadRequestForEdit() {
+        int tenantId = currentTenantId();
+        databaseExecutor.execute(() -> {
+            Request request = AppDatabase.getInstance(getApplicationContext())
+                    .requestDao().getById(editRequestId);
+
+            mainHandler.post(() -> {
+                if (isFinishing() || isDestroyed()) return;
+
+                if (request == null || request.tenantId != tenantId) {
+                    Toast.makeText(this, "Request not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                if (!Request.STATUS_PENDING.equals(request.status)) {
+                    Toast.makeText(this, "Completed requests can't be edited",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+
+                tvFormTitle.setText("Edit Request");
+                etTitle.setText(request.title);
+                etDescription.setText(request.description);
+                btnSubmit.setText("Save Changes");
+                btnDelete.setVisibility(android.view.View.VISIBLE);
+            });
+        });
     }
 
     private void submitRequest() {
@@ -69,6 +122,11 @@ public class NewRequestActivity extends AppCompatActivity {
         }
 
         btnSubmit.setEnabled(false);
+
+        if (editRequestId != -1) {
+            saveChanges(title, description);
+            return;
+        }
 
         databaseExecutor.execute(() -> {
             try {
@@ -109,6 +167,69 @@ public class NewRequestActivity extends AppCompatActivity {
                     ).show();
                 });
             }
+        });
+    }
+
+    private void saveChanges(String title, String description) {
+        databaseExecutor.execute(() -> {
+            RequestDao dao = AppDatabase.getInstance(getApplicationContext()).requestDao();
+            // Re-read so a status change made meanwhile is never overwritten.
+            Request request = dao.getById(editRequestId);
+
+            String error = null;
+            if (request == null) {
+                error = "Request no longer exists";
+            } else if (!Request.STATUS_PENDING.equals(request.status)) {
+                error = "This request can no longer be edited";
+            } else {
+                request.title = title;
+                request.description = description;
+                dao.update(request);
+            }
+
+            String message = error;
+            mainHandler.post(() -> {
+                if (message == null) {
+                    Toast.makeText(this, "Request updated", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    btnSubmit.setEnabled(true);
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+        });
+    }
+
+    private void confirmDelete() {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete request?")
+                .setMessage("This can't be undone.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> deleteRequest())
+                .show();
+    }
+
+    private void deleteRequest() {
+        btnDelete.setEnabled(false);
+        databaseExecutor.execute(() -> {
+            RequestDao dao = AppDatabase.getInstance(getApplicationContext()).requestDao();
+            Request request = dao.getById(editRequestId);
+
+            String message;
+            if (request == null) {
+                message = "Request no longer exists";
+            } else if (!Request.STATUS_PENDING.equals(request.status)) {
+                message = "This request can no longer be deleted";
+            } else {
+                dao.delete(request);
+                message = "Request deleted";
+            }
+
+            mainHandler.post(() -> {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                finish();
+            });
         });
     }
 

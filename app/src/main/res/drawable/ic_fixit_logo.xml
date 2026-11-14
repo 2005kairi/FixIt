@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Green rounded-square background -->
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M48,0 H152 A48,48 0 0 1 200,48 V152 A48,48 0 0 1 152,200 H48 A48,48 0 0 1 0,152 V48 A48,48 0 0 1 48,0 Z" />
+
+    <!-- House: roof, then walls -->
+    <path
+        android:pathData="M26,96 L100,38 L174,96"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="17"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M52,78 V162 H148 V78"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="16"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Wrench: handle, head, and the open jaw -->
+    <path
+        android:pathData="M82,141 L118,105"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="11"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M105.5,99 a17.5,17.5 0 1,0 35,0 a17.5,17.5 0 1,0 -35,0 Z" />
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M119.1,95.1 L133.2,81 L141,88.8 L126.9,102.9 Z" />
+</vector>
