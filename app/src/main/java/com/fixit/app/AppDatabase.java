@@ -6,28 +6,33 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-// Owner: Person 6 (Database + Integration)
-// Shared singleton depended on by everyone's DAOs - start once User and Request entities exist.
-@Database(entities = {User.class, Request.class}, version = 1, exportSchema = false)
+@Database(
+        entities = {User.class, Request.class},
+        version = 1,
+        exportSchema = false
+)
 public abstract class AppDatabase extends RoomDatabase {
 
+    private static volatile AppDatabase instance;
+
     public abstract UserDao userDao();
+
     public abstract RequestDao requestDao();
 
-    private static volatile AppDatabase INSTANCE;
-
     public static AppDatabase getInstance(Context context) {
-        if (INSTANCE == null) {
+        if (instance == null) {
             synchronized (AppDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     AppDatabase.class,
-                                    "fixit_database")
+                                    "fixit_db"
+                            )
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
         }
-        return INSTANCE;
+        return instance;
     }
 }

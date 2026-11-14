@@ -33,6 +33,7 @@ dependencies {
 
     // RecyclerView - Person 3 (Tenant request list)
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     // Room - Person 2 / Person 5 / Person 6 (local database)
     implementation "androidx.room:room-runtime:2.6.1"
